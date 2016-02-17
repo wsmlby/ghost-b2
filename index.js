@@ -4,29 +4,29 @@ var fs          = require('fs'),
     path        = require('path'),
     Promise     = require('bluebird'),
     util        = require('util'),
-    gcloud      = require('gcloud'),
+    B2          = require('backblaze-b2'),
     errors      = require('../../core/server/errors'),
     utils       = require('../../core/server/utils'),
     baseStore   = require('../../core/server/storage/base'),
     options     = {},
     bucket;
 
-function GStore(config) {
+function BStore(config) {
     options = config || {};
 
-    var gcs = gcloud.storage({
-        projectId: options.projectId,
-        keyFilename: options.key
+    var b2 = new B2({
+        accountId: options.projectId,
+        applicationKey: options.key
     });
-    bucket = gcs.bucket(options.bucket);
+    bucket = options.bucket;
 
 }
 
-util.inherits(GStore, baseStore);
+util.inherits(BStore, baseStore);
 
-GStore.prototype.save = function(image) {
+BStore.prototype.save = function(image) {
     var _self = this;
-    if (!options) return Promise.reject('google cloud storage is not configured');
+    if (!options) return Promise.reject('b2 cloud storage is not configured');
 
     var targetDir = _self.getTargetDir(),
     googleStoragePath = 'https://' + options.bucket + '.storage.googleapis.com/',
@@ -52,7 +52,7 @@ GStore.prototype.save = function(image) {
             file.makePublic(function(err, apiResponse) {
                 if(err) {
                     reject(err);
-                    return; 
+                    return;
                 }
                 resolve();
                 return;
@@ -68,14 +68,14 @@ GStore.prototype.save = function(image) {
 };
 
 // middleware for serving the files
-GStore.prototype.serve = function() {
+BStore.prototype.serve = function() {
     // a no-op, these are absolute URLs
     return function (req, res, next) {
       next();
     };
 };
 
-GStore.prototype.exists = function (filename) {
+BStore.prototype.exists = function (filename) {
   return new Promise(function (resolve) {
     fs.exists(filename, function (exists) {
       resolve(exists);
@@ -84,4 +84,4 @@ GStore.prototype.exists = function (filename) {
 };
 
 
-module.exports = GStore;
+module.exports = BStore;

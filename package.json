@@ -1,31 +1,31 @@
 {
-  "name": "ghost-google-cloud-storage",
+  "name": "ghost-b2-cloud-storage",
   "version": "0.1.0",
-  "description": "A simple plugin to add Google Cloud Storage support for Ghost Blog",
+  "description": "A simple plugin to add Backblaze(B2) Cloud Cloud Storage support for Ghost Blog",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/thombuchi/ghost-google-cloud-storage.git"
+    "url": "https://github.com/wsmlby/ghost-b2.git"
   },
   "keywords": [
     "ghost",
-    "google cloud",
+    "Backblaze(B2) Cloud",
     "storage",
     "plugin",
     "blog"
   ],
-  "author": "Thomas Büchi Sagredo <thombuchi@gmail.com>)",
+  "author": "Bingyan Liu(wsmlby@gmail.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/thombuchi/ghost-google-cloud-storage/issues"
+    "url": "https://github.com/wsmlby/ghost-b2/issues"
   },
-  "homepage": "https://github.com/thombuchi/ghost-google-cloud-storage",
+  "homepage": "https://github.com/wsmlby/ghost-b2",
   "dependencies": {
     "bluebird": "^3.1.1",
-    "gcloud": "^0.27.0",
+    "backblaze-b2": "0.9.9",
     "util": "^0.10.3"
   }
 }

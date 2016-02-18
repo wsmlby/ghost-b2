@@ -13,17 +13,17 @@ var fs          = require('fs'),
 
 function BStore(config) {
     options = config || {};
-
-    var b2 = new B2({
+    var self = this;
+    self.b2 = new B2({
         accountId: options.projectId,
         applicationKey: options.key
     });
-    var self = this;
+
     self.downloadUrl = "";
     self.bucketId = options.bucketId;
-    self.bucketName = options.bucketId;
-    b2.authorize().then(function(data) {
-      self.downloadUrl = data.downloadUrl + '/' +self.bucketName;
+    self.bucketName = options.bucketName;
+    self.b2.authorize().then(function(data) {
+      self.downloadUrl = data.downloadUrl + '/file/' +self.bucketName + '/';
     });
 
 
@@ -36,24 +36,28 @@ BStore.prototype.save = function(image) {
     if (!options) return Promise.reject('b2 cloud storage is not configured');
 
     var targetDir = _self.getTargetDir(),
-    targetFilename;
-
-    return this.getUniqueFileName(this, image, targetDir).then(function (filename) {
-        targetFilename = filename
-        var opts = {
-            destination: targetDir + targetFilename
-        };
-        return new Promise(function(resolve, reject) {
-            b2.getUploadUrl(_self.bucketId).then(function(data){
-              b2.uploadFile({
-
-              }).then(function(fn){
-                resolve(_self.downloadUrl + targetFilename);
-              }).catch(function(e){
-                reject(e);
-              });
-            });
-        })
+    destination;
+    return Promise.props({data: new Promise(function(resolve, reject) {
+      fs.readFile(image.path, function (err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    }), url: this.getUniqueFileName(this, image, targetDir).then(function (filename) {
+        destination =  filename;
+        return _self.b2.getUploadUrl(_self.bucketId);
+    })}).then(function(obj) {
+      return _self.b2.uploadFile({
+        uploadUrl:obj.url.uploadUrl,
+        uploadAuthToken: obj.url.authorizationToken,
+        filename: destination,
+        data: obj.data
+      });
+    }).then(function(fn){
+      return _self.downloadUrl + destination;
+    }).catch(function(e){
     });
 };
 

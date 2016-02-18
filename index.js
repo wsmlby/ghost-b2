@@ -18,7 +18,14 @@ function BStore(config) {
         accountId: options.projectId,
         applicationKey: options.key
     });
-    bucket = options.bucket;
+    var self = this;
+    self.downloadUrl = "";
+    self.bucketId = options.bucketId;
+    self.bucketName = options.bucketId;
+    b2.authorize().then(function(data) {
+      self.downloadUrl = data.downloadUrl + '/' +self.bucketName;
+    });
+
 
 }
 
@@ -29,7 +36,6 @@ BStore.prototype.save = function(image) {
     if (!options) return Promise.reject('b2 cloud storage is not configured');
 
     var targetDir = _self.getTargetDir(),
-    googleStoragePath = 'https://' + options.bucket + '.storage.googleapis.com/',
     targetFilename;
 
     return this.getUniqueFileName(this, image, targetDir).then(function (filename) {
@@ -38,33 +44,17 @@ BStore.prototype.save = function(image) {
             destination: targetDir + targetFilename
         };
         return new Promise(function(resolve, reject) {
-            bucket.upload(image.path, opts, function(err, file) {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                resolve(file);
-                return;
-            });
-        })
-    }).then(function(file){
-        return new Promise(function(resolve, reject) {
-            file.makePublic(function(err, apiResponse) {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                resolve();
-                return;
-            });
-        })
-    }).then(function () {
-        return googleStoragePath + targetDir + targetFilename;
-    }).catch(function (e) {
-        errors.logError(e);
-        return Promise.reject(e);
-    });
+            b2.getUploadUrl(_self.bucketId).then(function(data){
+              b2.uploadFile({
 
+              }).then(function(fn){
+                resolve(_self.downloadUrl + targetFilename);
+              }).catch(function(e){
+                reject(e);
+              });
+            });
+        })
+    });
 };
 
 // middleware for serving the files

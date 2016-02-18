@@ -7,27 +7,26 @@ A simple plugin to add Backblaze(B2) Cloud Storage support for a Ghost Blog
 
 ## Create storage module
 
-Create index.js file with folder path 'content/storage/gcloud/index.js' (manually create folder if not exist)
+Create index.js file with folder path 'content/storage/bcloud/index.js' (manually create folder if not exist)
 
     'use strict';
     module.exports = require('ghost-b2-cloud-storage');
 
 ## Configuration
 
-Create a bucket on your Backblaze(B2) Cloud storage project. In storage settings you will find your project id as `x-goog-project-id`, after  that  you need to go to your API credentials and create a server to server auth with json key.
+Create a bucket on your Backblaze(B2) Cloud storage project.
 
 Add this key on your root ghost folder or any folder you want.
 
 Add `storage` block to file `config.js` in each environment as below:
 
-    storage: {
-        active: 'gcloud',
-        'gcloud': {
-            projectId: 'Your_project_id',
-            key: 'Your_key_path', // if is in the ghost root folder just add the name of the file
-            bucket: 'Your_bucket_name',
-        }
-    },
 
-Future updates -->
-Add possibility to change asset domain. Right now it uses the default  `bucket_name.storage.b2apis.com/
+    storage: {
+      active: 'bcloud',
+      'bcloud': {
+          projectId: 'Your_project_id',
+          bucketId: 'Your_bucket_id',
+          bucketName: 'Your_bucket_name',
+          key: 'Your_api_key'
+      }
+    }

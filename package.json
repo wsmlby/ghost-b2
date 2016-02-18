@@ -1,6 +1,6 @@
 {
   "name": "ghost-b2-cloud-storage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple plugin to add Backblaze(B2) Cloud Cloud Storage support for Ghost Blog",
   "main": "index.js",
   "scripts": {
